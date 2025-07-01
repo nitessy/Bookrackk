@@ -100,24 +100,74 @@ console.log(cloudinaryResponse);
 
 
 
-export const updateBlogController = async (req,res) =>{
-    try{
-        const {id} = req.params;
-const {title, description, image, } = req.body;
-const blog = await blogModel.findByIdAndUpdate(id, {...req.body}, {new:true})
-return res.status(200).send({
-    success: true,
-    message:"Updated",
-    blog,
-})
-    }catch(error){
-        console.log(error)
-        return res.status(400).send({
-message: 'Error while updating blog'
+// export const updateBlogController = async (req,res) =>{
+//     try{
+//         const {id} = req.params;
+// const {title, description, image, } = req.body;
+// const blog = await blogModel.findByIdAndUpdate(id, {...req.body}, {new:true})
+// return res.status(200).send({
+//     success: true,
+//     message:"Updated",
+//     blog,
+// })
+//     }catch(error){
+//         console.log(error)
+//         return res.status(400).send({
+// message: 'Error while updating blog'
 
-        })
+//         })
+//     }
+// }
+export const updateBlogController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description } = req.body;
+    const imageFile = req.files?.image;
+
+    if (!title || !description) {
+      return res.status(400).send({ message: "Missing fields" });
     }
-}
+
+    let imagePath = null;
+
+    // If image was uploaded, handle and store it
+    if (imageFile) {
+      const allowedFormats = ["image/jpeg", "image/png", "image/webp"];
+      if (!allowedFormats.includes(imageFile.mimetype)) {
+        return res.status(400).send({ message: "Invalid image format" });
+      }
+
+      const filename = `${Date.now()}_${imageFile.name}`;
+      const filepath = `uploads/${filename}`;
+      await imageFile.mv(filepath);
+      imagePath = filepath;
+    }
+
+    const updatedFields = {
+      title,
+      description,
+    };
+    if (imagePath) updatedFields.image = imagePath;
+
+    const blog = await blogModel.findByIdAndUpdate(id, updatedFields, { new: true });
+
+    return res.status(200).send({
+      success: true,
+      message: "Updated",
+      blog,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send({
+      message: "Error while updating blog",
+    });
+  }
+};
+
+
+
+
+
 
 export const getBlogbyIdController = async (req, res) => {
   try {
@@ -153,7 +203,7 @@ export const getBlogbyIdController = async (req, res) => {
 
 export const deleteBlogController = async (req,res) =>{
     try{
- const blog = await blogModel.findOneAndDelete(req.params.id).populate("user");
+ const blog = await blogModel.findByIdAndDelete(req.params.id).populate("user");
  await blog.user.blogs.pull(blog);
  await blog.user.save();
  return res.status(200).send({
