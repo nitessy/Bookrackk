@@ -118,52 +118,66 @@ console.log(cloudinaryResponse);
 //         })
 //     }
 // }
+
+
 export const updateBlogController = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description } = req.body;
     const imageFile = req.files?.image;
 
-    if (!title || !description) {
-      return res.status(400).send({ message: "Missing fields" });
-    }
+    const updatedFields = {};
 
-    let imagePath = null;
+    if (title) updatedFields.title = title;
+    if (description) updatedFields.description = description;
 
-    // If image was uploaded, handle and store it
     if (imageFile) {
-      const allowedFormats = ["image/jpeg", "image/png", "image/webp"];
+      const allowedFormats = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
       if (!allowedFormats.includes(imageFile.mimetype)) {
         return res.status(400).send({ message: "Invalid image format" });
       }
 
-      const filename = `${Date.now()}_${imageFile.name}`;
-      const filepath = `uploads/${filename}`;
-      await imageFile.mv(filepath);
-      imagePath = filepath;
+      const cloudinaryResponse = await cloudinary.uploader.upload(imageFile.tempFilePath);
+
+      if (!cloudinaryResponse || cloudinaryResponse.error) {
+        return res.status(500).send({
+          message: "Image upload failed",
+          error: cloudinaryResponse?.error || "No response",
+        });
+      }
+
+      updatedFields.image = {
+        public_id: cloudinaryResponse.public_id,
+        url: cloudinaryResponse.secure_url,
+      };
     }
 
-    const updatedFields = {
-      title,
-      description,
-    };
-    if (imagePath) updatedFields.image = imagePath;
+    // If no fields to update
+    if (Object.keys(updatedFields).length === 0) {
+      return res.status(400).send({
+        message: "No fields provided to update.",
+      });
+    }
 
     const blog = await blogModel.findByIdAndUpdate(id, updatedFields, { new: true });
 
+    if (!blog) {
+      return res.status(404).send({ message: "Blog not found" });
+    }
+
     return res.status(200).send({
       success: true,
-      message: "Updated",
+      message: "Blog updated successfully",
       blog,
     });
   } catch (error) {
-    console.log(error);
-    return res.status(400).send({
+    console.error("Update Error:", error);
+    return res.status(500).send({
       message: "Error while updating blog",
+      error: error.message,
     });
   }
 };
-
 
 
 
