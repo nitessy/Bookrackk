@@ -3,6 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import colors from 'colors';
 import dotenv from 'dotenv';
+import axios from 'axios';
 
 import {v2 as cloudinary} from 'cloudinary';
 import fileUpload from 'express-fileupload';
@@ -36,6 +37,26 @@ app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: "/tmp/",
 }))
+
+
+const url = `https://bookrackk.onrender.com`;
+const interval = 30000;
+
+function reloadWebsite() {
+  axios
+    .get(url)
+    .then((response) => {
+      console.log("website reloded");
+    })
+    .catch((error) => {
+      console.error(`Error : ${error.message}`);
+    });
+}
+
+setInterval(reloadWebsite, interval);
+
+
+
 
 //routes
 app.use("/api/user", userRoutes);
