@@ -19,10 +19,10 @@ router.get('/all-blog', getAllBlogsController);
 router.get('/get-blog/:id', getBlogbyIdController);
 
 // Protected routes
-router.post('/create-blog', createBlogController);
-router.put('/update-blog/:id', updateBlogController);
-// router.delete('/delete-blog/:id', requireSignIn, deleteBlogController);
-router.delete('/delete-blog/:id', deleteBlogController);
-router.get('/user-blog/:id', userBlogController);
+router.post('/create-blog', requireSignIn, createBlogController);
+router.put('/update-blog/:id',requireSignIn, updateBlogController);
+router.delete('/delete-blog/:id', requireSignIn, deleteBlogController);
+// router.delete('/delete-blog/:id', deleteBlogController);
+router.get('/user-blog/:id', requireSignIn, userBlogController);
 
 export default router;
