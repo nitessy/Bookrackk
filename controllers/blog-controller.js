@@ -67,7 +67,7 @@ console.log(cloudinaryResponse);
       user,
       image: {
         public_id: cloudinaryResponse.public_id,
-        url: cloudinaryResponse.secure_url, // ✅ FIXED HERE
+        url: cloudinaryResponse.secure_url, 
       },
     });
 
@@ -78,7 +78,7 @@ console.log(cloudinaryResponse);
     existinguser.blogs.push(newBlog);
     await existinguser.save({ session });
     await session.commitTransaction();
-    session.endSession(); // ✅ Important to end session after commit
+    session.endSession(); // Session ended
 
 //    await newBlog.save();
 // existinguser.blogs.push(newBlog);
