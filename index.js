@@ -48,9 +48,7 @@ function reloadWebsite() {
     .then((response) => {
       console.log("website reloded");
     })
-    .catch((error) => {
-      console.error(`Error : ${error.message}`);
-    });
+    
 }
 
 setInterval(reloadWebsite, interval);
