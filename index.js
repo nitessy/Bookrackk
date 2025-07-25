@@ -39,19 +39,19 @@ app.use(fileUpload({
 }))
 
 
-const url = `https://bookrackk.onrender.com`;
-const interval = 30000;
+// const url = `https://bookrackk.onrender.com`;
+// const interval = 30000;
 
-function reloadWebsite() {
-  axios
-    .get(url)
-    .then((response) => {
-      console.log("website reloded");
-    })
+// function reloadWebsite() {
+//   axios
+//     .get(url)
+//     .then((response) => {
+//       console.log("website reloded");
+//     })
     
-}
+// }
 
-setInterval(reloadWebsite, interval);
+// setInterval(reloadWebsite, interval);
 
 
 
